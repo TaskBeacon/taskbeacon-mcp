@@ -141,7 +141,7 @@ def transform_prompt(source_task: str, target_task: str) -> UserMessage:
 
 
 @mcp.prompt(title="Localize task")
-def localize_prompt(yaml_text: str, target_language: str, voice_options: Optional[str] = None) -> list[Message]:
+def localize_prompt(yaml_text: str, target_language: str, cfg_path: str, voice_options: Optional[str] = None) -> list[Message]:
     intro = (
         f"Translate selected fields of this PsyFlow config into {target_language}. "
         "Translate ONLY:"
@@ -161,7 +161,8 @@ def localize_prompt(yaml_text: str, target_language: str, voice_options: Optiona
             "If no suitable voice is available, set `voice_name: null`."
             f"Available voices: {voice_options}; select one from it"
         )
-    intro += "Lastly, output the entire translated and updated config.yaml content with no commentary."
+    intro += "Lastly, output the entire translated and updated config.yaml content with no commentary"
+    intro += f"The final output should be saved as {cfg_path}"
     return [UserMessage(intro), UserMessage(yaml_text)]
 
 
@@ -407,7 +408,7 @@ async def localize(task_path: str, target_language: str, voice: Optional[str] = 
         for f in assets_path.glob("*_voice.mp3"):
             f.unlink()
 
-    cfg_path = Path(task_path) / "config.yaml"
+    cfg_path = Path(task_path) / "config" / "config.yaml"
     if not cfg_path.exists():
         raise FileNotFoundError("config.yaml not found in given path.")
     yaml_text = cfg_path.read_text(encoding="utf-8")
@@ -419,8 +420,11 @@ async def localize(task_path: str, target_language: str, voice: Optional[str] = 
         lang_code = _get_lang_code(target_language)
         voice_options = await list_voices(filter_lang=lang_code)
 
-    msgs = localize_prompt(yaml_text, target_language, voice_options)
-    return {"prompt_messages": [m.dict() for m in msgs]}
+    msgs = localize_prompt(yaml_text, target_language, str(cfg_path), voice_options)
+    return {
+        "prompt_messages": [m.dict() for m in msgs],
+        "save_path": str(cfg_path),
+    }
 
 @mcp.tool()
 async def list_voices(filter_lang: Optional[str] = None) -> str:

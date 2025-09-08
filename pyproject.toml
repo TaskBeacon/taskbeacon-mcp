@@ -1,6 +1,6 @@
 [project]
 name = "taskbeacon-mcp"
-version = "0.1.4"
+version = "0.1.7"
 description = "A model contexture protocal (MCP) for TaskBeacon"
 authors = [
   { name = "Zhipeng Cao", email = "zhipeng30@foxmail.com" }
@@ -15,6 +15,7 @@ dependencies = [
   "mcp[cli]",
   "ruamel.yaml",
   "edge_tts",
+  "fuzzywuzz",
 ]
 keywords = ["taskbeacon", "mcp", "uv", "TaskBeacon"]
 classifiers = [
