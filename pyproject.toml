@@ -1,6 +1,6 @@
 [project]
 name = "taskbeacon-mcp"
-version = "0.1.7"
+version = "0.1.8"
 description = "A model contexture protocal (MCP) for TaskBeacon"
 authors = [
   { name = "Zhipeng Cao", email = "zhipeng30@foxmail.com" }
@@ -15,7 +15,8 @@ dependencies = [
   "mcp[cli]",
   "ruamel.yaml",
   "edge_tts",
-  "fuzzywuzz",
+  # Bugfix: the code imports `fuzzywuzzy`, not `fuzzywuzz`.
+  "fuzzywuzzy",
 ]
 keywords = ["taskbeacon", "mcp", "uv", "TaskBeacon"]
 classifiers = [
@@ -29,7 +30,12 @@ Repository = "https://github.com/TaskBeacon/taskbeacon-mcp"
 "Bug Tracker" = "https://github.com/TaskBeacon/taskbeacon-mcp/issues"
 
 [project.scripts]
-taskbeacon-mcp = "taskbeacon_mcp.main:main"
+taskbeacon-mcp = "taskbeacon_mcp.server:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
 
 
 [build-system]
@@ -40,3 +46,8 @@ build-backend = "setuptools.build_meta"
 # This belongs here, not under [project]
 required-version = ">=0.8.3"
 
+[tool.setuptools]
+packages = { find = { exclude = ["tests*"] } }
+
+[tool.setuptools.package-data]
+taskbeacon_mcp = ["prompts/*.md"]
